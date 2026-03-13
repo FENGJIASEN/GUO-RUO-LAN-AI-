@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>毕设详情 | 早期神经性厌食症检测系统 - 郭若岚</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0F172A;
+            --bg-secondary: #1E293B;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --accent-blue: #38BDF8;
+            --accent-green: #34D399;
+            --accent-purple: #A78BFA;
+            --accent-orange: #FB923C;
+            --gradient-1: linear-gradient(135deg, #38BDF8 0%, #34D399 100%);
+            --gradient-2: linear-gradient(135deg, #A78BFA 0%, #38BDF8 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(56, 189, 248, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(52, 211, 153, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(167, 139, 250, 0.05) 0%, transparent 70%);
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(56, 189, 248, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent-blue);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(167, 139, 250, 0.1);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--accent-purple);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            font-size: 2.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .meta-item {
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .meta-item strong {
+            color: var(--accent-blue);
+        }
+
+        /* Section Styles */
+        section {
+            padding: 4rem 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Abstract Section */
+        #abstract {
+            background: linear-gradient(180deg, transparent 0%, rgba(30, 41, 59, 0.3) 100%);
+        }
+
+        .abstract-content {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .abstract-content h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--accent-purple);
+        }
+
+        .abstract-content p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .challenge-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .challenge-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            border-left: 3px solid var(--accent-orange);
+        }
+
+        .challenge-icon {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .challenge-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .challenge-text strong {
+            color: var(--text-primary);
+        }
+
+        /* Tech Stack Section */
+        #techstack {
+            padding-top: 0;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .tech-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .tech-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(56, 189, 248, 0.3);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .tech-card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .tech-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: rgba(56, 189, 248, 0.15);
+        }
+
+        .tech-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .tech-card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Architecture Section */
+        #architecture {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.3) 0%, transparent 100%);
+            padding-top: 0;
+        }
+
+        .architecture-flow {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            padding: 2rem 0;
+        }
+
+        .arch-node {
+            background: var(--bg-card);
+            border: 2px solid rgba(56, 189, 248, 0.3);
+            border-radius: 14px;
+            padding: 1.5rem;
+            text-align: center;
+            min-width: 180px;
+            transition: all 0.3s ease;
+        }
+
+        .arch-node:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.2);
+        }
+
+        .arch-node.primary {
+            border-color: rgba(167, 139, 250, 0.5);
+        }
+
+        .arch-node.primary:hover {
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 30px rgba(167, 139, 250, 0.2);
+        }
+
+        .arch-node-title {
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 0.5rem;
+        }
+
+        .arch-node-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .arch-arrow {
+            color: var(--accent-blue);
+            font-size: 1.5rem;
+            padding: 0 0.5rem;
+        }
+
+        /* Results Section */
+        #results {
+            padding-top: 0;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .metric-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 1.75rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(52, 211, 153, 0.3);
+        }
+
+        .metric-card.highlight {
+            border-color: rgba(52, 211, 153, 0.5);
+            background: rgba(52, 211, 153, 0.05);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-green);
+            margin-bottom: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-sublabel {
+            font-size: 0.75rem;
+            color: var(--accent-blue);
+        }
+
+        /* Comparison Table */
+        .comparison-table {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            overflow: hidden;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .comparison-header {
+            display: grid;
+            grid-template-columns: 1.5fr repeat(4, 1fr);
+            padding: 1rem 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .comparison-row {
+            display: grid;
+            grid-template-columns: 1.5fr repeat(4, 1fr);
+            padding: 1rem 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        .comparison-row:hover {
+            background: rgba(56, 189, 248, 0.05);
+        }
+
+        .comparison-row.best {
+            background: rgba(52, 211, 153, 0.08);
+        }
+
+        .comparison-row .model-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .comparison-row .metric-cell {
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .comparison-row.best .metric-cell {
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        /* Dataset Section */
+        #dataset {
+            padding-top: 0;
+        }
+
+        .dataset-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .dataset-info {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 1.75rem;
+        }
+
+        .dataset-info h3 {
+            font-size: 1.15rem;
+            margin-bottom: 1rem;
+            color: var(--accent-blue);
+        }
+
+        .dataset-stats {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-value.normal {
+            color: var(--accent-green);
+        }
+
+        .stat-value.risk {
+            color: var(--accent-orange);
+        }
+
+        .imbalance-visual {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 1.75rem;
+        }
+
+        .imbalance-visual h3 {
+            font-size: 1.15rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .bar-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .bar-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .bar-label {
+            width: 80px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-align: right;
+        }
+
+        .bar-track {
+            flex: 1;
+            height: 32px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 0.75rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            border-radius: 6px;
+            transition: width 1s ease;
+        }
+
+        .bar-fill.normal {
+            background: var(--accent-green);
+            width: 87%;
+        }
+
+        .bar-fill.risk {
+            background: var(--accent-orange);
+            width: 13%;
+        }
+
+        /* Contributions Section */
+        #contributions {
+            padding-top: 0;
+        }
+
+        .contributions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .contribution-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 1.5rem;
+            border-left: 3px solid var(--accent-purple);
+            transition: all 0.3s ease;
+        }
+
+        .contribution-card:hover {
+            transform: translateX(4px);
+            border-left-color: var(--accent-blue);
+        }
+
+        .contribution-card h3 {
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            color: var(--accent-blue);
+        }
+
+        .contribution-card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        footer a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .hero-meta {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .architecture-flow {
+                flex-direction: column;
+            }
+
+            .arch-arrow {
+                transform: rotate(90deg);
+            }
+
+            .dataset-content {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison-header,
+            .comparison-row {
+                grid-template-columns: 1.2fr repeat(2, 1fr);
+            }
+
+            .comparison-header > *:nth-child(n+4),
+            .comparison-row > *:nth-child(n+4) {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <a href="index.html" class="nav-logo">Ruolan AI</a>
+        <a href="index.html" class="back-link">
+            ← 返回首页
+        </a>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                🎓 硕士毕业设计
+            </div>
+            <h1>早期神经性厌食症检测系统</h1>
+            <p class="hero-subtitle">
+                基于社交媒体文本的深度学习多任务学习框架
+            </p>
+            <div class="hero-meta">
+                <div class="meta-item">
+                    <strong>学校：</strong>马来西亚国立大学 (UKM)
+                </div>
+                <div class="meta-item">
+                    <strong>导师：</strong>Prof. Dr. Mohd Juzaiddin Ab Aziz
+                </div>
+                <div class="meta-item">
+                    <strong>提交：</strong>2026年2月16日
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Abstract Section -->
+    <section id="abstract">
+        <div class="container">
+            <div class="section-header">
+                <h2>研究背景与挑战</h2>
+                <p>为什么选择这个研究课题？</p>
+            </div>
+            <div class="abstract-content fade-in">
+                <h3>研究背景</h3>
+                <p>
+                    神经性厌食症（Anorexia Nervosa）是一种严重的精神疾病，发病率在全球范围内持续上升。早期症状难以识别，通常被忽视或隐藏。社交媒体（如Reddit）成为发现早期语言信号的重要来源。本研究旨在通过深度学习技术，从社交媒体文本中自动检测早期神经性厌食症风险。
+                </p>
+                <h3>研究挑战</h3>
+                <div class="challenge-list">
+                    <div class="challenge-item">
+                        <span class="challenge-icon">⚠️</span>
+                        <div class="challenge-text">
+                            <strong>传统诊断局限：</strong>依赖临床访谈或问卷，主观性强、耗时长，难以大规模筛查
+                        </div>
+                    </div>
+                    <div class="challenge-item">
+                        <span class="challenge-icon">💻</span>
+                        <div class="challenge-text">
+                            <strong>计算效率问题：</strong>现有深度学习方法处理长文本时计算资源消耗大，复杂度高达O(n²)
+                        </div>
+                    </div>
+                    <div class="challenge-item">
+                        <span class="challenge-icon">🎭</span>
+                        <div class="challenge-text">
+                            <strong>情感信息利用不足：</strong>情绪分析通常作为独立任务，未能充分利用用户帖子中的情感线索
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack Section -->
+    <section id="techstack">
+        <div class="container">
+            <div class="section-header">
+                <h2>核心技术方案</h2>
+                <p>创新性地融合多种前沿AI技术</p>
+            </div>
+            <div class="tech-grid">
+                <div class="tech-card fade-in">
+                    <div class="tech-card-header">
+                        <div class="tech-icon">🔤</div>
+                        <h3>XLM-RoBERTa</h3>
+                    </div>
+                    <p>作为基础编码器，生成高质量的上下文语义表示，支持多语言文本处理，捕获用户帖子的深层语义特征。</p>
+                </div>
+                <div class="tech-card fade-in">
+                    <div class="tech-card-header">
+                        <div class="tech-icon">🌊</div>
+                        <h3>Mamba</h3>
+                    </div>
+                    <p>状态空间模型（SSM），用于捕获长距离依赖关系。相比Transformer，具有更低的计算复杂度，更适合处理长文本。</p>
+                </div>
+                <div class="tech-card fade-in">
+                    <div class="tech-card-header">
+                        <div class="tech-icon">💭</div>
+                        <h3>Qwen3-Reranker</h3>
+                    </div>
+                    <p>本地部署的0.6B参数模型，生成1024维情感嵌入，提取用户的情感特征（正面/中性/负面），为预测提供辅助信号。</p>
+                </div>
+                <div class="tech-card fade-in">
+                    <div class="tech-card-header">
+                        <div class="tech-icon">🎯</div>
+                        <h3>多任务学习</h3>
+                    </div>
+                    <p>创新性地将厌食症风险预测作为主任务，情感分类作为辅助任务，实现任务间的知识共享与迁移学习。</p>
+                </div>
+                <div class="tech-card fade-in">
+                    <div class="tech-card-header">
+                        <div class="tech-icon">⚖️</div>
+                        <h3>Focal Loss</h3>
+                    </div>
+                    <p>处理严重的类别不平衡问题（6.8:1），通过动态调整损失函数，使模型更关注难以分类的少数类样本。</p>
+                </div>
+                <div class="tech-card fade-in">
+                    <div class="tech-card-header">
+                        <div class="tech-icon">🔄</div>
+                        <h3>情感特征注入</h3>
+                    </div>
+                    <p>将Qwen3提取的情感嵌入与主模型输出进行特征融合，让模型理解用户帖子背后的情感状态。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section id="architecture">
+        <div class="container">
+            <div class="section-header">
+                <h2>系统架构</h2>
+                <p>端到端的深度学习 pipeline</p>
+            </div>
+            <div class="architecture-flow fade-in">
+                <div class="arch-node">
+                    <div class="arch-node-title">社交媒体文本</div>
+                    <div class="arch-node-desc">Reddit 用户帖子</div>
+                </div>
+                <span class="arch-arrow">→</span>
+                <div class="arch-node primary">
+                    <div class="arch-node-title">XLM-RoBERTa</div>
+                    <div class="arch-node-desc">语义编码</div>
+                </div>
+                <span class="arch-arrow">→</span>
+                <div class="arch-node primary">
+                    <div class="arch-node-title">Mamba</div>
+                    <div class="arch-node-desc">长序列建模</div>
+                </div>
+                <span class="arch-arrow">→</span>
+                <div class="arch-node">
+                    <div class="arch-node-title">Qwen3 情感</div>
+                    <div class="arch-node-desc">特征注入</div>
+                </div>
+                <span class="arch-arrow">→</span>
+                <div class="arch-node primary">
+                    <div class="arch-node-title">多任务输出</div>
+                    <div class="arch-node-desc">风险预测 + 情感分类</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section id="results">
+        <div class="container">
+            <div class="section-header">
+                <h2>实验结果</h2>
+                <p>在 eRisk 测试集上的性能表现</p>
+            </div>
+            <div class="metrics-grid fade-in">
+                <div class="metric-card highlight">
+                    <div class="metric-value">98.4%</div>
+                    <div class="metric-label">准确率 (Accuracy)</div>
+                    <div class="metric-sublabel">▲ 2.5% vs 基准</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">93.4%</div>
+                    <div class="metric-label">召回率 (Recall)</div>
+                    <div class="metric-sublabel">关键指标：早期检测</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">0.842</div>
+                    <div class="metric-label">F1 分数</div>
+                    <div class="metric-sublabel">精确率与召回率平衡</div>
+                </div>
+                <div class="metric-card highlight">
+                    <div class="metric-value">0.985</div>
+                    <div class="metric-label">AUC 分数</div>
+                    <div class="metric-sublabel">分类区分能力</div>
+                </div>
+            </div>
+
+            <div class="comparison-table fade-in">
+                <div class="comparison-header">
+                    <span>模型</span>
+                    <span>准确率</span>
+                    <span>精确率</span>
+                    <span>召回率</span>
+                    <span>F1</span>
+                </div>
+                <div class="comparison-row">
+                    <span class="model-name">SVM (Word2Vec)</span>
+                    <span class="metric-cell">0.952</span>
+                    <span class="metric-cell">0.349</span>
+                    <span class="metric-cell">0.040</span>
+                    <span class="metric-cell">0.071</span>
+                </div>
+                <div class="comparison-row">
+                    <span class="model-name">Linear Model</span>
+                    <span class="metric-cell">0.949</span>
+                    <span class="metric-cell">0.300</span>
+                    <span class="metric-cell">0.073</span>
+                    <span class="metric-cell">0.117</span>
+                </div>
+                <div class="comparison-row">
+                    <span class="model-name">XLM-RoBERTa</span>
+                    <span class="metric-cell">0.959</span>
+                    <span class="metric-cell">0.538</span>
+                    <span class="metric-cell">0.936</span>
+                    <span class="metric-cell">0.683</span>
+                </div>
+                <div class="comparison-row best">
+                    <span class="model-name">★ 最终模型 (Ours)</span>
+                    <span class="metric-cell">0.984</span>
+                    <span class="metric-cell">0.767</span>
+                    <span class="metric-cell">0.934</span>
+                    <span class="metric-cell">0.842</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dataset Section -->
+    <section id="dataset">
+        <div class="container">
+            <div class="section-header">
+                <h2>数据集信息</h2>
+                <p>eRisk 2018/2019 共享任务数据集</p>
+            </div>
+            <div class="dataset-content fade-in">
+                <div class="dataset-info">
+                    <h3>数据集统计</h3>
+                    <div class="dataset-stats">
+                        <div class="stat-row">
+                            <span class="stat-label">总用户数</span>
+                            <span class="stat-value">320</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">正常用户</span>
+                            <span class="stat-value normal">279 (87%)</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">潜在厌食症用户</span>
+                            <span class="stat-value risk">41 (13%)</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">类别比例</span>
+                            <span class="stat-value">6.8 : 1</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">数据来源</span>
+                            <span class="stat-value">Reddit</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="imbalance-visual">
+                    <h3>类别分布 (6.8:1)</h3>
+                    <div class="bar-container">
+                        <div class="bar-item">
+                            <span class="bar-label">正常</span>
+                            <div class="bar-track">
+                                <div class="bar-fill normal">87%</div>
+                            </div>
+                        </div>
+                        <div class="bar-item">
+                            <span class="bar-label">风险</span>
+                            <div class="bar-track">
+                                <div class="bar-fill risk">13%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contributions Section -->
+    <section id="contributions">
+        <div class="container">
+            <div class="section-header">
+                <h2>研究贡献</h2>
+                <p>本研究的创新点与价值</p>
+            </div>
+            <div class="contributions-grid">
+                <div class="contribution-card fade-in">
+                    <h3>🎨 混合架构创新</h3>
+                    <p>首次提出结合Transformer编码器与Mamba状态空间组件的混合架构，兼顾语义理解与长序列建模效率。</p>
+                </div>
+                <div class="contribution-card fade-in">
+                    <h3>💡 情感特征注入</h3>
+                    <p>创新性地整合Qwen3提取的情感嵌入，通过多任务学习框架实现情感感知表示学习。</p>
+                </div>
+                <div class="contribution-card fade-in">
+                    <h3>🏥 医疗AI价值</h3>
+                    <p>验证了情感感知表示学习在心理健康NLP中的重要性，为早期心理疾病筛查提供新思路。</p>
+                </div>
+                <div class="contribution-card fade-in">
+                    <h3>📊 技术验证</h3>
+                    <p>对比了传统机器学习(SVM)与状态空间模型(Mamba)的性能，证明了深度学习方法的优越性。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Implementation Section -->
+    <section id="code" style="padding: 4rem 2rem; max-width: 1200px; margin: 0 auto;">
+        <div class="section-header" style="text-align: center; margin-bottom: 3rem;">
+            <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem;">核心代码实现</h2>
+            <p style="color: var(--text-secondary);">数据处理与深度学习模型训练</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div style="background: var(--bg-card); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 12px; padding: 1.5rem;">
+                <h4 style="font-size: 1rem; margin-bottom: 1rem; color: var(--accent-blue);">�数据清洗 (Python/NLTK)</h4>
+                <pre style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; overflow-x: auto; font-size: 0.75rem; line-height: 1.5; color: #e2e8f0;"><code># XML解析与文本预处理
+from lxml import etree
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+
+def process_text(text, stop_words, lemmatizer):
+    # 小写转换
+    text = text.lower()
+    # 分词
+    tokens = word_tokenize(text)
+    # 移除停用词 & 词形还原
+    tokens = [lemmatizer.lemmatize(w) for w in tokens
+              if w not in stop_words and w.isalpha()]
+    return ' '.join(tokens)
+
+# 并行处理多个文件
+with ThreadPoolExecutor(max_workers=8) as executor:
+    futures = [executor.submit(process_files, chunk)
+               for chunk in file_chunks]</code></pre>
+            </div>
+
+            <div style="background: var(--bg-card); border: 1px solid rgba(167, 139, 250, 0.2); border-radius: 12px; padding: 1.5rem;">
+                <h4 style="font-size: 1rem; margin-bottom: 1rem; color: var(--accent-purple);">🔧 模型训练 (PyTorch)</h4>
+                <pre style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; overflow-x: auto; font-size: 0.75rem; line-height: 1.5; color: #e2e8f0;"><code># XLM-RoBERTa + Mamba 多任务学习
+from transformers import AutoModel, AutoTokenizer
+import torch.nn as nn
+
+class MultiTaskModel(nn.Module):
+    def __init__(self, bert_path, n_class=2):
+        super().__init__()
+        self.roberta = AutoModel.from_pretrained(bert_path)
+        self.mamba = MambaLayer(d_model=768)
+        self.classifier = nn.Linear(768, n_class)
+        self.focal_loss = FocalLoss(alpha=0.25, gamma=2.0)
+
+    def forward(self, input_ids, attention_mask, qwen_feat):
+        # RoBERTa 编码
+        roberta_out = self.roberta(input_ids, attention_mask)
+        # Mamba 长序列建模
+        mamba_out = self.mamba(roberta_out.last_hidden_state)
+        # 融合 Qwen3 情感特征
+        fused = mamba_out + qwen_feat
+        # 多任务输出
+        return self.classifier(fused)</code></pre>
+            </div>
+
+            <div style="background: var(--bg-card); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 12px; padding: 1.5rem;">
+                <h4 style="font-size: 1rem; margin-bottom: 1rem; color: var(--accent-green);">⚡ 训练配置</h4>
+                <pre style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; overflow-x: auto; font-size: 0.75rem; line-height: 1.5; color: #e2e8f0;"><code># 训练超参数配置
+config = {
+    'bert_path': 'roberta-pretrained',
+    'emb_dim': 768,       # RoBERTa
+    'feat_dim': 1024,     # Qwen3 Embedding
+    'n_class': 2,
+    'batch_train': 8,
+    'lr': 1e-5,           # 学习率
+    'epoch': 40,
+    'max_grad_norm': 10
+}
+
+# 优化器 & 学习率调度
+optimizer = torch.optim.AdamW(model.parameters(), lr=config['lr'])
+scheduler = get_linear_schedule_with_warmup(
+    optimizer,
+    num_warmup_steps=100,
+    num_training_steps=len(train_loader)*config['epoch']
+)</code></pre>
+            </div>
+
+            <div style="background: var(--bg-card); border: 1px solid rgba(251, 146, 60, 0.2); border-radius: 12px; padding: 1.5rem;">
+                <h4 style="font-size: 1rem; margin-bottom: 1rem; color: var(--accent-orange);">📊 模型评估</h4>
+                <pre style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; overflow-x: auto; font-size: 0.75rem; line-height: 1.5; color: #e2e8f0;"><code># 评估指标计算
+from sklearn.metrics import precision_recall_fscore_support
+
+def evaluate(model, test_loader):
+    model.eval()
+    all_preds, all_labels = [], []
+
+    with torch.no_grad():
+        for batch in test_loader:
+            outputs = model(**batch)
+            preds = torch.argmax(outputs, dim=1)
+            all_preds.extend(preds.cpu().numpy())
+            all_labels.extend(batch['labels'].numpy())
+
+    # 计算各项指标
+    precision, recall, f1, _ = precision_recall_fscore_support(
+        all_labels, all_preds, average='weighted'
+    )
+    return {'precision': precision, 'recall': recall, 'f1': f1}</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>
+            © 2026 郭若岚 | 硕士毕业设计 | 马来西亚国立大学<br>
+            <a href="index.html">← 返回首页</a>
+        </p>
+    </footer>
+
+    <script>
+        // Scroll Animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Nav background on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.style.background = 'rgba(15, 23, 42, 0.95)';
+            } else {
+                nav.style.background = 'rgba(15, 23, 42, 0.8)';
+            }
+        });
+    </script>
+
+<style>
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.inland-security-footer {
+  position: fixed;
+  z-index: 10;
+  bottom: 0;
+  right: 0;
+  width: fit-content;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.tooltip-container {
+  position: relative;
+}
+
+.trigger-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  background-color: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.minimax-link {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 300;
+  color: #adadad;
+  text-decoration: none;
+}
+
+.minimax-link:visited {
+  color: #adadad;
+}
+
+.minimax-link:hover {
+  color: #666666;
+}
+
+.tooltip-content {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  padding-bottom: 16px; /* 8px 内容间距 + 8px 用于鼠标移动的透明区域 */
+  font-size: 12px;
+  line-height: 17px;
+  background-color: #fafafa;
+  border-radius: 12px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  color: #171717;
+}
+
+/* 创建透明的连接区域，让鼠标可以平滑移动到 tooltip */
+.tooltip-content::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 16px;
+}
+
+.tooltip-container:hover .tooltip-content {
+  display: flex;
+}
+
+.info-section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.beian-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #171717;
+}
+
+.beian-icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 2px;
+}
+
+.underline-text {
+  color: #171717;
+  text-decoration: underline;
+}
+
+.underline-text:hover {
+  color: #000000;
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .trigger-content {
+    background-color: transparent;
+  }
+
+  .minimax-link,
+  .minimax-link:visited {
+    color: #666666;
+  }
+
+  .minimax-link:hover {
+    color: #adadad;
+  }
+
+  .tooltip-content {
+    background-color: #262626;
+    color: #ededed;
+  }
+
+  .beian-link,
+  .underline-text {
+    color: #ededed;
+  }
+
+  .underline-text:hover {
+    color: #ffffff;
+  }
+}
+
+</style>
+
+<!-- Neural Network Canvas Background -->
+<canvas id="neural-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;"></canvas>
+
+<!-- AI Effects -->
+<script>
+class NeuralNetwork {
+    constructor() {
+        this.canvas = document.getElementById('neural-canvas');
+        if (!this.canvas) return;
+        this.ctx = this.canvas.getContext('2d');
+        this.particles = [];
+        this.connections = [];
+        this.init();
+        this.animate();
+    }
+    init() {
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        const particleCount = Math.floor((this.canvas.width * this.canvas.height) / 20000);
+        for (let i = 0; i < particleCount; i++) {
+            this.particles.push({
+                x: Math.random() * this.canvas.width,
+                y: Math.random() * this.canvas.height,
+                vx: (Math.random() - 0.5) * 0.3,
+                vy: (Math.random() - 0.5) * 0.3,
+                radius: Math.random() * 2 + 1,
+                color: ['rgba(56, 189, 248, ', 'rgba(52, 211, 153, ', 'rgba(167, 139, 250, '][Math.floor(Math.random() * 3)]
+            });
+        }
+    }
+    resize() {
+        if (!this.canvas) return;
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+    }
+    update() {
+        this.particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.x < 0 || p.x > this.canvas.width) p.vx *= -1;
+            if (p.y < 0 || p.y > this.canvas.height) p.vy *= -1;
+        });
+        this.connections = [];
+        for (let i = 0; i < this.particles.length; i++) {
+            for (let j = i + 1; j < this.particles.length; j++) {
+                const dx = this.particles[i].x - this.particles[j].x;
+                const dy = this.particles[i].y - this.particles[j].y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < 120) {
+                    this.connections.push({from: this.particles[i], to: this.particles[j], opacity: 1 - distance / 120});
+                }
+            }
+        }
+    }
+    draw() {
+        if (!this.ctx) return;
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.connections.forEach(conn => {
+            this.ctx.beginPath();
+            this.ctx.moveTo(conn.from.x, conn.from.y);
+            this.ctx.lineTo(conn.to.x, conn.to.y);
+            this.ctx.strokeStyle = `rgba(56, 189, 248, ${conn.opacity * 0.1})`;
+            this.ctx.lineWidth = 1;
+            this.ctx.stroke();
+        });
+        this.particles.forEach(p => {
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            this.ctx.fillStyle = p.color + '0.5)';
+            this.ctx.fill();
+        });
+    }
+    animate() {
+        this.update();
+        this.draw();
+        requestAnimationFrame(() => this.animate());
+    }
+}
+
+// Floating particles
+function createFloatingParticles() {
+    for (let i = 0; i < 8; i++) {
+        setTimeout(() => {
+            const particle = document.createElement('div');
+            particle.style.cssText = `position:fixed;width:4px;height:4px;border-radius:50%;pointer-events:none;opacity:0.5;z-index:1;left:${Math.random() * 100}vw;background:${['var(--accent-blue)','var(--accent-green)','var(--accent-purple)'][Math.floor(Math.random()*3)]};animation:floatParticle 12s infinite linear;`;
+            document.body.appendChild(particle);
+            setTimeout(() => particle.remove(), 12000);
+        }, i * 1000);
+    }
+}
+
+// Add floating animation
+const style = document.createElement('style');
+style.textContent = `@keyframes floatParticle{0%{transform:translateY(100vh) rotate(0deg);opacity:0}10%{opacity:0.5}90%{opacity:0.5}100%{transform:translateY(-100vh) rotate(720deg);opacity:0}}`;
+document.head.appendChild(style);
+
+document.addEventListener('DOMContentLoaded', () => {
+    new NeuralNetwork();
+    createFloatingParticles();
+});
+</script>
+
+<div class="inland-security-footer">
+  <div class="tooltip-container">
+    <div class="trigger-content">
+      <a href="https://www.minimaxi.com/" target="_blank" rel="noreferrer" class="minimax-link">
+        <span>© 2026 MiniMax</span>
+      </a>
+    </div>
+    <div class="tooltip-content">
+      <section class="info-section">
+        <span>上海稀宇科技有限公司</span>
+      </section>
+
+      <section class="info-section">
+        <a class="beian-link" href="https://www.beian.gov.cn/portal/registerSystemInfo?recordcode=31010402010179" target="_blank" rel="noreferrer">
+          <img alt="hailuo-beian-icon" src="https://cdn.hailuoai.com/hailuo-video-web/public_assets/223037d3-79fd-4db0-a456-749f38a6a14b.png" class="beian-icon">
+          <span class="underline-text">沪公网安备31010402010179号</span>
+        </a>
+        <a href="https://beian.miit.gov.cn/" target="_blank" rel="noreferrer" class="underline-text">
+          沪ICP备2023003282号-38
+        </a>
+      </section>
+
+      <section class="info-section">
+        <span>模型名称：MiniMax</span>
+        <span>备案号：Shanghai-MiniMax-202505230046</span>
+      </section>
+
+      <section class="info-section">
+        <a href="https://agent.minimaxi.com/doc/zh/terms-of-service.html" target="_blank" rel="noreferrer" class="underline-text">
+          用户协议
+        </a>
+        <a href="https://agent.minimaxi.com/doc/zh/privacy-policy.html" target="_blank" rel="noreferrer" class="underline-text">
+          隐私政策
+        </a>
+      </section>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

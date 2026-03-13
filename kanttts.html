@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KAN-TTS语音合成系统 | 郭若岚</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0F172A;
+            --bg-secondary: #1E293B;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --accent-blue: #38BDF8;
+            --accent-green: #34D399;
+            --accent-purple: #A78BFA;
+            --accent-orange: #FB923C;
+            --accent-red: #EF4444;
+            --gradient-1: linear-gradient(135deg, #38BDF8 0%, #34D399 100%);
+            --gradient-2: linear-gradient(135deg, #A78BFA 0%, #38BDF8 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(56, 189, 248, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(52, 211, 153, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(167, 139, 250, 0.05) 0%, transparent 70%);
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(56, 189, 248, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent-blue);
+        }
+
+        .hero {
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(52, 211, 153, 0.1);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--accent-green);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .meta-item {
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .meta-item strong {
+            color: var(--accent-blue);
+        }
+
+        section {
+            padding: 4rem 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        #overview {
+            background: linear-gradient(180deg, transparent 0%, rgba(30, 41, 59, 0.3) 100%);
+        }
+
+        .overview-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .overview-text h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--accent-blue);
+        }
+
+        .overview-text p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        .tech-stack {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 1.5rem;
+        }
+
+        .tech-stack h4 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--accent-purple);
+        }
+
+        .tech-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tech-item {
+            padding: 0.375rem 0.75rem;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-blue);
+        }
+
+        #architecture {
+            padding-top: 0;
+        }
+
+        .arch-flow {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 2rem 0;
+        }
+
+        .arch-step {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+            min-width: 160px;
+            transition: all 0.3s ease;
+        }
+
+        .arch-step:hover {
+            transform: translateY(-4px);
+            border-color: rgba(52, 211, 153, 0.3);
+        }
+
+        .arch-step-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .arch-step-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .arch-step-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .arch-arrow {
+            color: var(--accent-blue);
+            font-size: 1.25rem;
+        }
+
+        #pipeline {
+            padding-top: 0;
+        }
+
+        .pipeline-grid {
+            display: grid;
+            gap: 1.25rem;
+        }
+
+        .pipeline-item {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 1.5rem;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .pipeline-item:hover {
+            border-color: rgba(56, 189, 248, 0.2);
+        }
+
+        .pipeline-number {
+            width: 40px;
+            height: 40px;
+            background: rgba(56, 189, 248, 0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            flex-shrink: 0;
+        }
+
+        .pipeline-content h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pipeline-content p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+        }
+
+        .pipeline-code {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            overflow-x: auto;
+        }
+
+        .pipeline-code code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent-green);
+            white-space: pre;
+        }
+
+        #challenges {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.3) 0%, transparent 100%);
+            padding-top: 0;
+        }
+
+        .challenges-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .challenge-item {
+            background: var(--bg-card);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .challenge-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.25rem;
+            background: rgba(239, 68, 68, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .challenge-header:hover {
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        .challenge-icon {
+            font-size: 1.25rem;
+        }
+
+        .challenge-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .challenge-status {
+            padding: 0.25rem 0.75rem;
+            background: rgba(52, 211, 153, 0.15);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--accent-green);
+        }
+
+        .challenge-body {
+            padding: 1.25rem;
+        }
+
+        .challenge-body p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .challenge-solution {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            border-left: 3px solid var(--accent-green);
+        }
+
+        .challenge-solution code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent-green);
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        #results {
+            padding-top: 0;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .result-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-green);
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .api-demo {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .api-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.25rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .api-method {
+            padding: 0.25rem 0.75rem;
+            background: rgba(52, 211, 153, 0.15);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent-green);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .api-url {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .api-body {
+            padding: 1.25rem;
+        }
+
+        .api-request {
+            margin-bottom: 1rem;
+        }
+
+        .api-request h4 {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent-purple);
+        }
+
+        .api-code {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            overflow-x: auto;
+        }
+
+        .api-code code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        footer a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .overview-content {
+                grid-template-columns: 1fr;
+            }
+
+            .arch-flow {
+                flex-direction: column;
+            }
+
+            .arch-arrow {
+                transform: rotate(90deg);
+            }
+
+            .pipeline-item {
+                grid-template-columns: 1fr;
+            }
+
+            .pipeline-number {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+
+    <nav>
+        <a href="index.html" class="nav-logo">Ruolan AI</a>
+        <a href="index.html" class="back-link">
+            ← 返回首页
+        </a>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                🔊 语音AI
+            </div>
+            <h1>KAN-TTS 语音合成系统</h1>
+            <p class="hero-subtitle">
+                基于阿里ModelScope框架的自定义声音模型训练与部署
+            </p>
+            <div class="hero-meta">
+                <div class="meta-item">
+                    <strong>公司：</strong>中国电子科技集团公司第二十研究所
+                </div>
+                <div class="meta-item">
+                    <strong>框架：</strong>KAN-TTS (Alibaba)
+                </div>
+                <div class="meta-item">
+                    <strong>训练：</strong>202 steps
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="overview">
+        <div class="container">
+            <div class="section-header">
+                <h2>项目概述</h2>
+                <p>端到端的语音合成系统搭建</p>
+            </div>
+            <div class="overview-content fade-in">
+                <div class="overview-text">
+                    <h3>项目背景</h3>
+                    <p>
+                        在中国电子科技集团公司第二十研究所实习期间，基于阿里KAN-TTS框架搭建语音合成训练环境，完成自定义声音模型的训练与优化，并搭建Flask接口提供端到端的语音合成服务。
+                    </p>
+                    <p>
+                        项目实现了从环境配置、数据准备、模型训练到API服务部署的完整流程，展现了AI工程实践能力。
+                    </p>
+                    <h3 style="margin-top: 1.5rem;">技术目标</h3>
+                    <p>
+                        • 构建GPU训练环境容器化部署<br>
+                        • 完成自定义声音数据的模型微调<br>
+                        • 提供RESTful API语音合成服务
+                    </p>
+                </div>
+                <div class="tech-stack">
+                    <h4>技术栈</h4>
+                    <div class="tech-items">
+                        <span class="tech-item">Docker</span>
+                        <span class="tech-item">GPU</span>
+                        <span class="tech-item">Python 3.7</span>
+                        <span class="tech-item">TensorFlow 1.15</span>
+                        <span class="tech-item">ModelScope</span>
+                        <span class="tech-item">KAN-TTS</span>
+                        <span class="tech-item">SAMBERT</span>
+                        <span class="tech-item">HiFi-GAN</span>
+                        <span class="tech-item">Flask</span>
+                        <span class="tech-item">CUDA 12.1</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="architecture">
+        <div class="container">
+            <div class="section-header">
+                <h2>系统架构</h2>
+                <p>端到端语音合成 pipeline</p>
+            </div>
+            <div class="arch-flow fade-in">
+                <div class="arch-step">
+                    <div class="arch-step-icon">🐳</div>
+                    <div class="arch-step-title">Docker容器</div>
+                    <div class="arch-step-desc">GPU环境配置</div>
+                </div>
+                <span class="arch-arrow">→</span>
+                <div class="arch-step">
+                    <div class="arch-step-icon">🎤</div>
+                    <div class="arch-step-title">数据准备</div>
+                    <div class="arch-step-desc">语音数据打标</div>
+                </div>
+                <span class="arch-arrow">→</span>
+                <div class="arch-step">
+                    <div class="arch-step-icon">🧠</div>
+                    <div class="arch-step-title">模型训练</div>
+                    <div class="arch-step-desc">SAMBERT微调</div>
+                </div>
+                <span class="arch-arrow">→</span>
+                <div class="arch-step">
+                    <div class="arch-step-icon">🔧</div>
+                    <div class="arch-step-title">推理引擎</div>
+                    <div class="arch-step-desc">自定义模型加载</div>
+                </div>
+                <span class="arch-arrow">→</span>
+                <div class="arch-step">
+                    <div class="arch-step-icon">🌐</div>
+                    <div class="arch-step-title">API服务</div>
+                    <div class="arch-step-desc">Flask接口</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="pipeline">
+        <div class="container">
+            <div class="section-header">
+                <h2>技术实现</h2>
+                <p>完整的模型训练与部署流程</p>
+            </div>
+            <div class="pipeline-grid">
+                <div class="pipeline-item fade-in">
+                    <div class="pipeline-number">1</div>
+                    <div class="pipeline-content">
+                        <h3>Docker GPU 环境配置</h3>
+                        <p>基于 NVIDIA CUDA 12.1 + Ubuntu 20.04 构建训练容器，配置 Anaconda 环境与 ModelScope SDK。</p>
+                        <div class="pipeline-code">
+                            <code>docker run --gpus all -it nvidia/cuda:12.1.0-runtime-ubuntu20.04
+conda create -n mytts python=3.7.13
+pip install tensorflow==1.15.4
+pip install modelscope==1.5.2</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pipeline-item fade-in">
+                    <div class="pipeline-number">2</div>
+                    <div class="pipeline-content">
+                        <h3>训练数据打标</h3>
+                        <p>使用 ModelScope 自动标注工具对原始语音数据进行预处理，生成训练所需的标注文件。</p>
+                        <div class="pipeline-code">
+                            <code>from modelscope.tools import run_auto_label
+input_wav = "/home/aiwu/KAN-TTS/test_female/"
+output_data = "./output_training_femaledata/"
+ret, report = run_auto_label(input_wav=input_wav,
+                             work_dir=output_data,
+                             resource_revision="v1.0.6")</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pipeline-item fade-in">
+                    <div class="pipeline-number">3</div>
+                    <div class="pipeline-content">
+                        <h3>SAMBERT 模型微调</h3>
+                        <p>基于预训练模型 speech_personal_sambert-hifigan_nsf_tts_zh-cn_pretrain_16k 进行微调训练。</p>
+                        <div class="pipeline-code">
+                            <code>train_info = {
+    TtsTrainType.TRAIN_TYPE_SAMBERT: {
+        'train_steps': 202,
+        'save_interval_steps': 200,
+        'log_interval': 10
+    }
+}
+trainer = build_trainer(Trainers.speech_kantts_trainer, ...)
+trainer.train()</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pipeline-item fade-in">
+                    <div class="pipeline-number">4</div>
+                    <div class="pipeline-content">
+                        <h3>Flask API 部署</h3>
+                        <p>搭建 RESTful API 服务，提供文本到语音的合成接口，支持与业务系统集成。</p>
+                        <div class="pipeline-code">
+                            <code>@app.route("/tts", methods=["POST"])
+def tts():
+    data = request.get_json()
+    output = inference(input=data['data'])
+    wav = output[OutputKeys.OUTPUT_WAV]
+    return jsonify({'audio': wav})
+
+app.run(host='0.0.0.0', port=8089)</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="challenges">
+        <div class="container">
+            <div class="section-header">
+                <h2>工程挑战</h2>
+                <p>问题排查与解决方案</p>
+            </div>
+            <div class="challenges-grid">
+                <div class="challenge-item fade-in">
+                    <div class="challenge-header">
+                        <span class="challenge-icon">🔧</span>
+                        <span class="challenge-title">sox 库缺失</span>
+                        <span class="challenge-status">已解决</span>
+                    </div>
+                    <div class="challenge-body">
+                        <p>数据打标过程中提示 sox 音频处理库未安装，导致标注脚本无法运行。</p>
+                        <div class="challenge-solution">
+                            <code># 安装系统级音频处理工具
+sudo apt-get -y update
+sudo apt-get install sox
+
+# 或通过 pip 安装 Python 绑定
+pip install sox</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="challenge-item fade-in">
+                    <div class="challenge-header">
+                        <span class="challenge-icon">🔧</span>
+                        <span class="challenge-title">typeguard 版本兼容</span>
+                        <span class="challenge-status">已解决</span>
+                    </div>
+                    <div class="challenge-body">
+                        <p>typeguard 3.0 版本中移除了 check_argument_types 函数，导致 ModelScope SDK 无法导入。</p>
+                        <div class="challenge-solution">
+                            <code># 卸载新版本，安装兼容版本
+pip uninstall typeguard
+pip install typeguard==2.13.3</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="challenge-item fade-in">
+                    <div class="challenge-header">
+                        <span class="challenge-icon">🔧</span>
+                        <span class="challenge-title">KAN-TTS 模块缺失</span>
+                        <span class="challenge-status">已解决</span>
+                    </div>
+                    <div class="challenge-body">
+                        <p>训练脚本提示缺少 kantts 核心模块，需要额外安装阿里定制的 TTS 工具包。</p>
+                        <div class="challenge-solution">
+                            <code># 从 ModelScope 官方源安装
+pip install kantts -f https://modelscope.oss-cn-beijing.aliyuncs.com/releases/repo.html</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="challenge-item fade-in">
+                    <div class="challenge-header">
+                        <span class="challenge-icon">🔧</span>
+                        <span class="challenge-title">依赖包冲突</span>
+                        <span class="challenge-status">已解决</span>
+                    </div>
+                    <div class="challenge-body">
+                        <p>训练过程中缺少多个依赖包：unidecode、pytorch_wavelets、pysptk 等。</p>
+                        <div class="challenge-solution">
+                            <code># 安装所有必需依赖
+pip install unidecode
+pip install pytorch_wavelets pywt tensorboardX pysptk bitstring</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="results">
+        <div class="container">
+            <div class="section-header">
+                <h2>项目成果</h2>
+                <p>训练指标与服务部署</p>
+            </div>
+            <div class="results-grid fade-in">
+                <div class="result-card">
+                    <div class="result-value">202</div>
+                    <div class="result-label">训练步数</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-value">8089</div>
+                    <div class="result-label">API 端口</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-value">✓</div>
+                    <div class="result-label">自定义模型</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-value">✓</div>
+                    <div class="result-label">Docker 部署</div>
+                </div>
+            </div>
+
+            <div class="api-demo fade-in">
+                <div class="api-header">
+                    <span class="api-method">POST</span>
+                    <span class="api-url">http://127.0.0.1:8089/tts</span>
+                </div>
+                <div class="api-body">
+                    <div class="api-request">
+                        <h4>请求示例</h4>
+                        <div class="api-code">
+                            <code>{
+  "data": "大家好，我是艾武，今年27岁，毕业于武警工程大学，现致力于研究人工智能领域。"
+}</code>
+                        </div>
+                    </div>
+                    <div class="api-request">
+                        <h4>响应格式</h4>
+                        <div class="api-code">
+                            <code>{
+  "message": "完成合成",
+  "audio_file": "0.wav"
+}</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>
+            © 2026 郭若岚 | KAN-TTS语音合成项目 | 中国电子科技集团第二十研究所<br>
+            <a href="index.html">← 返回首页</a>
+        </p>
+    </footer>
+
+    <script>
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.style.background = 'rgba(15, 23, 42, 0.95)';
+            } else {
+                nav.style.background = 'rgba(15, 23, 42, 0.8)';
+            }
+        });
+    </script>
+
+<style>
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.inland-security-footer {
+  position: fixed;
+  z-index: 10;
+  bottom: 0;
+  right: 0;
+  width: fit-content;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.tooltip-container {
+  position: relative;
+}
+
+.trigger-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  background-color: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.minimax-link {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 300;
+  color: #adadad;
+  text-decoration: none;
+}
+
+.minimax-link:visited {
+  color: #adadad;
+}
+
+.minimax-link:hover {
+  color: #666666;
+}
+
+.tooltip-content {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  padding-bottom: 16px; /* 8px 内容间距 + 8px 用于鼠标移动的透明区域 */
+  font-size: 12px;
+  line-height: 17px;
+  background-color: #fafafa;
+  border-radius: 12px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  color: #171717;
+}
+
+/* 创建透明的连接区域，让鼠标可以平滑移动到 tooltip */
+.tooltip-content::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 16px;
+}
+
+.tooltip-container:hover .tooltip-content {
+  display: flex;
+}
+
+.info-section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.beian-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #171717;
+}
+
+.beian-icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 2px;
+}
+
+.underline-text {
+  color: #171717;
+  text-decoration: underline;
+}
+
+.underline-text:hover {
+  color: #000000;
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .trigger-content {
+    background-color: transparent;
+  }
+
+  .minimax-link,
+  .minimax-link:visited {
+    color: #666666;
+  }
+
+  .minimax-link:hover {
+    color: #adadad;
+  }
+
+  .tooltip-content {
+    background-color: #262626;
+    color: #ededed;
+  }
+
+  .beian-link,
+  .underline-text {
+    color: #ededed;
+  }
+
+  .underline-text:hover {
+    color: #ffffff;
+  }
+}
+
+</style>
+
+<!-- Neural Network Canvas Background -->
+<canvas id="neural-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;"></canvas>
+
+<!-- AI Effects -->
+<script>
+class NeuralNetwork {
+    constructor() {
+        this.canvas = document.getElementById('neural-canvas');
+        if (!this.canvas) return;
+        this.ctx = this.canvas.getContext('2d');
+        this.particles = [];
+        this.connections = [];
+        this.init();
+        this.animate();
+    }
+    init() {
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        const particleCount = Math.floor((this.canvas.width * this.canvas.height) / 20000);
+        for (let i = 0; i < particleCount; i++) {
+            this.particles.push({
+                x: Math.random() * this.canvas.width,
+                y: Math.random() * this.canvas.height,
+                vx: (Math.random() - 0.5) * 0.3,
+                vy: (Math.random() - 0.5) * 0.3,
+                radius: Math.random() * 2 + 1,
+                color: ['rgba(236, 72, 153, ', 'rgba(168, 85, 247, ', 'rgba(56, 189, 248, '][Math.floor(Math.random() * 3)]
+            });
+        }
+    }
+    resize() {
+        if (!this.canvas) return;
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+    }
+    update() {
+        this.particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.x < 0 || p.x > this.canvas.width) p.vx *= -1;
+            if (p.y < 0 || p.y > this.canvas.height) p.vy *= -1;
+        });
+        this.connections = [];
+        for (let i = 0; i < this.particles.length; i++) {
+            for (let j = i + 1; j < this.particles.length; j++) {
+                const dx = this.particles[i].x - this.particles[j].x;
+                const dy = this.particles[i].y - this.particles[j].y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < 120) {
+                    this.connections.push({from: this.particles[i], to: this.particles[j], opacity: 1 - distance / 120});
+                }
+            }
+        }
+    }
+    draw() {
+        if (!this.ctx) return;
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.connections.forEach(conn => {
+            this.ctx.beginPath();
+            this.ctx.moveTo(conn.from.x, conn.from.y);
+            this.ctx.lineTo(conn.to.x, conn.to.y);
+            this.ctx.strokeStyle = `rgba(168, 85, 247, ${conn.opacity * 0.1})`;
+            this.ctx.lineWidth = 1;
+            this.ctx.stroke();
+        });
+        this.particles.forEach(p => {
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            this.ctx.fillStyle = p.color + '0.5)';
+            this.ctx.fill();
+        });
+    }
+    animate() {
+        this.update();
+        this.draw();
+        requestAnimationFrame(() => this.animate());
+    }
+}
+
+function createFloatingParticles() {
+    for (let i = 0; i < 8; i++) {
+        setTimeout(() => {
+            const particle = document.createElement('div');
+            particle.style.cssText = `position:fixed;width:4px;height:4px;border-radius:50%;pointer-events:none;opacity:0.5;z-index:1;left:${Math.random() * 100}vw;background:${['#EC4899','#A855F7','#38BDF8'][Math.floor(Math.random()*3)]};animation:floatParticle 12s infinite linear;`;
+            document.body.appendChild(particle);
+            setTimeout(() => particle.remove(), 12000);
+        }, i * 1000);
+    }
+}
+
+const style = document.createElement('style');
+style.textContent = `@keyframes floatParticle{0%{transform:translateY(100vh) rotate(0deg);opacity:0}10%{opacity:0.5}90%{opacity:0.5}100%{transform:translateY(-100vh) rotate(720deg);opacity:0}}`;
+document.head.appendChild(style);
+
+document.addEventListener('DOMContentLoaded', () => {
+    new NeuralNetwork();
+    createFloatingParticles();
+});
+</script>
+
+<div class="inland-security-footer">
+  <div class="tooltip-container">
+    <div class="trigger-content">
+      <a href="https://www.minimaxi.com/" target="_blank" rel="noreferrer" class="minimax-link">
+        <span>© 2026 MiniMax</span>
+      </a>
+    </div>
+    <div class="tooltip-content">
+      <section class="info-section">
+        <span>上海稀宇科技有限公司</span>
+      </section>
+
+      <section class="info-section">
+        <a class="beian-link" href="https://www.beian.gov.cn/portal/registerSystemInfo?recordcode=31010402010179" target="_blank" rel="noreferrer">
+          <img alt="hailuo-beian-icon" src="https://cdn.hailuoai.com/hailuo-video-web/public_assets/223037d3-79fd-4db0-a456-749f38a6a14b.png" class="beian-icon">
+          <span class="underline-text">沪公网安备31010402010179号</span>
+        </a>
+        <a href="https://beian.miit.gov.cn/" target="_blank" rel="noreferrer" class="underline-text">
+          沪ICP备2023003282号-38
+        </a>
+      </section>
+
+      <section class="info-section">
+        <span>模型名称：MiniMax</span>
+        <span>备案号：Shanghai-MiniMax-202505230046</span>
+      </section>
+
+      <section class="info-section">
+        <a href="https://agent.minimaxi.com/doc/zh/terms-of-service.html" target="_blank" rel="noreferrer" class="underline-text">
+          用户协议
+        </a>
+        <a href="https://agent.minimaxi.com/doc/zh/privacy-policy.html" target="_blank" rel="noreferrer" class="underline-text">
+          隐私政策
+        </a>
+      </section>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

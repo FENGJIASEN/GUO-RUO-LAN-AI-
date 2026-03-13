@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>情感分析方法比较研究 | AI Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: rgba(30, 41, 59, 0.8);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #8b5cf6;
+            --accent-emerald: #10b981;
+            --accent-red: #ef4444;
+            --accent-green: #22c55e;
+            --accent-gray: #64748b;
+            --gradient-cyan: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            --gradient-purple: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            --gradient-emerald: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: var(--gradient-cyan);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover { color: var(--accent-cyan); }
+
+        .hero {
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 8rem 2rem 4rem;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                var(--bg-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2306b6d4' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        .hero-content { position: relative; z-index: 1; max-width: 800px; }
+
+        .hero h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .hero .tags {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .hero .tag {
+            padding: 0.5rem 1rem;
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--accent-cyan);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        section {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p { color: var(--text-secondary); }
+
+        .overview-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .overview-grid { grid-template-columns: 1fr; }
+        }
+
+        .overview-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .overview-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(6, 182, 212, 0.3);
+        }
+
+        .overview-card h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .overview-card .icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .icon-dictionary { background: var(--gradient-purple); }
+        .icon-ml { background: var(--gradient-cyan); }
+
+        .overview-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+
+        .overview-card ul {
+            list-style: none;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .overview-card li {
+            padding: 0.25rem 0;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .overview-card li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent-cyan);
+        }
+
+        .dataset-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover { transform: translateY(-5px); }
+
+        .stat-number {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--gradient-cyan);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .sentiment-mapping {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .mapping-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .star-rating { display: flex; gap: 0.25rem; }
+        .star { color: #fbbf24; font-size: 1.1rem; }
+        .star.empty { opacity: 0.3; }
+        .arrow { color: var(--text-secondary); font-size: 1.2rem; }
+
+        .sentiment-tag {
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .tag-negative { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); }
+        .tag-neutral { background: rgba(100, 116, 139, 0.2); color: var(--accent-gray); }
+        .tag-positive { background: rgba(34, 197, 94, 0.2); color: var(--accent-green); }
+
+        .cleaning-process {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .cleaning-process { grid-template-columns: 1fr; }
+        }
+
+        .cleaning-step {
+            background: var(--bg-card);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .step-number {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 24px;
+            background: var(--gradient-cyan);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .cleaning-step h4 { font-size: 1rem; margin: 0.5rem 0; }
+        .cleaning-step p { font-size: 0.85rem; color: var(--text-secondary); }
+
+        .methods-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .methods-comparison { grid-template-columns: 1fr; }
+        }
+
+        .method-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .method-card.best {
+            border-color: rgba(34, 197, 94, 0.3);
+            position: relative;
+        }
+
+        .method-card.best::before {
+            content: '🏆 Best Performance';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent-green);
+            color: #000;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .method-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .method-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .method-header h3 { font-size: 1.25rem; }
+        .method-header p { font-size: 0.85rem; color: var(--text-secondary); }
+
+        .method-features {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .method-features li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .method-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--accent-green);
+        }
+
+        .threshold-box {
+            background: rgba(148, 163, 184, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .threshold-box .value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-purple);
+        }
+
+        .accuracy-box {
+            background: rgba(34, 197, 94, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .accuracy-box .value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        .accuracy-box .label { font-size: 0.85rem; color: var(--text-secondary); }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .results-grid { grid-template-columns: 1fr; }
+        }
+
+        .result-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .result-card h3 { font-size: 1.25rem; margin-bottom: 1.5rem; }
+
+        .distribution-bar {
+            display: flex;
+            height: 40px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .bar-positive { background: var(--accent-green); display: flex; align-items: center; justify-content: center; color: #000; font-weight: 600; font-size: 0.85rem; flex: 18602; }
+        .bar-negative { background: var(--accent-red); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; font-size: 0.85rem; flex: 8247; }
+        .bar-neutral { background: var(--accent-gray); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; font-size: 0.85rem; flex: 6547; }
+
+        .distribution-legend { display: flex; justify-content: space-around; }
+        .legend-item { text-align: center; }
+        .legend-item .count { font-size: 1.25rem; font-weight: 700; }
+        .legend-item .label { font-size: 0.85rem; color: var(--text-secondary); }
+
+        .model-comparison { display: flex; flex-direction: column; gap: 1rem; }
+
+        .model-item {
+            background: rgba(148, 163, 184, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .model-item.best {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .model-name { font-weight: 500; }
+        .model-accuracy { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--accent-cyan); }
+        .model-item.best .model-accuracy { color: var(--accent-green); }
+
+        .conclusion-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            margin-top: 2rem;
+        }
+
+        .conclusion-card h3 { font-size: 1.25rem; margin-bottom: 1.5rem; }
+
+        .finding-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .finding-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .finding-content h4 { font-size: 1rem; margin-bottom: 0.25rem; }
+        .finding-content p { font-size: 0.9rem; color: var(--text-secondary); }
+
+        .future-directions { margin-top: 2rem; }
+        .future-directions h3 { font-size: 1.25rem; margin-bottom: 1rem; }
+
+        .direction-item {
+            background: rgba(148, 163, 184, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .direction-number {
+            width: 32px;
+            height: 32px;
+            background: var(--gradient-cyan);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .direction-content h4 { font-size: 1rem; margin-bottom: 0.25rem; }
+        .direction-content p { font-size: 0.9rem; color: var(--text-secondary); }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 8px;
+            color: var(--text-primary);
+            text-decoration: none;
+            margin-top: 2rem;
+            transition: all 0.3s;
+        }
+
+        .back-link:hover {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            border-top: 1px solid rgba(148, 163, 184, 0.1);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        #neural-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="neural-canvas"></canvas>
+
+    <nav>
+        <a href="index.html" class="nav-brand">AI Portfolio</a>
+        <ul class="nav-links">
+            <li><a href="index.html">首页</a></li>
+            <li><a href="index.html#projects">项目</a></li>
+            <li><a href="index.html#about">关于</a></li>
+        </ul>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>基于词典法与机器学习的情感分析方法比较研究</h1>
+            <p class="subtitle">Comparative Analysis of Sentiment Analysis Methods Based on Dictionary and Machine Learning</p>
+            <div class="tags">
+                <span class="tag">VADER</span>
+                <span class="tag">Random Forest</span>
+                <span class="tag">TF-IDF</span>
+                <span class="tag">NLP</span>
+            </div>
+        </div>
+    </section>
+
+    <section id="overview">
+        <div class="section-header">
+            <h2>研究概述</h2>
+            <p>系统比较基于词典与基于机器学习的情感分析方法</p>
+        </div>
+        <div class="overview-grid">
+            <div class="overview-card">
+                <h3><span class="icon icon-dictionary">📖</span> 基于词典的方法</h3>
+                <p>使用预定义的情感词典（如VADER）来计算文本的整体情感得分，通过将文本中的词汇与词典中的情感分数进行匹配来得出结论。</p>
+                <ul>
+                    <li>无需训练数据</li>
+                    <li>解释性强</li>
+                    <li>执行效率高</li>
+                    <li>适用于简单场景</li>
+                </ul>
+            </div>
+            <div class="overview-card">
+                <h3><span class="icon icon-ml">🤖</span> 基于机器学习的方法</h3>
+                <p>利用模型（如朴素贝叶斯、随机森林）从标注数据中提取文本特征（如TF-IDF）并进行训练，捕捉更复杂的语言模式。</p>
+                <ul>
+                    <li>更强的适应性</li>
+                    <li>灵活的分类能力</li>
+                    <li>处理复杂语言</li>
+                    <li>需要标注数据</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="dataset">
+        <div class="section-header">
+            <h2>数据集</h2>
+            <p>33,000+ 条麦当劳门店Google评论数据</p>
+        </div>
+        <div class="dataset-stats">
+            <div class="stat-card">
+                <div class="stat-number">33,396</div>
+                <div class="stat-label">评论总数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">3</div>
+                <div class="stat-label">情感类别</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">5</div>
+                <div class="stat-label">评分星级</div>
+            </div>
+        </div>
+        <div class="sentiment-mapping">
+            <div class="mapping-item">
+                <div class="star-rating">
+                    <span class="star">★</span>
+                    <span class="star empty">☆</span>
+                    <span class="star empty">☆</span>
+                    <span class="star empty">☆</span>
+                    <span class="star empty">☆</span>
+                </div>
+                <span class="arrow">→</span>
+                <span class="sentiment-tag tag-negative">消极 (-1)</span>
+            </div>
+            <div class="mapping-item">
+                <div class="star-rating">
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star empty">☆</span>
+                    <span class="star empty">☆</span>
+                </div>
+                <span class="arrow">→</span>
+                <span class="sentiment-tag tag-neutral">中立 (0)</span>
+            </div>
+            <div class="mapping-item">
+                <div class="star-rating">
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                </div>
+                <span class="arrow">→</span>
+                <span class="sentiment-tag tag-positive">积极 (+1)</span>
+            </div>
+        </div>
+    </section>
+
+    <section id="cleaning">
+        <div class="section-header">
+            <h2>数据清洗流程</h2>
+            <p>六步数据预处理，提升模型性能</p>
+        </div>
+        <div class="cleaning-process">
+            <div class="cleaning-step">
+                <span class="step-number">1</span>
+                <h4>小写转换</h4>
+                <p>将所有文本转换为小写，消除大小写差异</p>
+            </div>
+            <div class="cleaning-step">
+                <span class="step-number">2</span>
+                <h4>数字移除</h4>
+                <p>清除数字模式如分数、小数等非语义字符</p>
+            </div>
+            <div class="cleaning-step">
+                <span class="step-number">3</span>
+                <h4>分词</h4>
+                <p>将文本分割成独立的单词或标记</p>
+            </div>
+            <div class="cleaning-step">
+                <span class="step-number">4</span>
+                <h4>停用词移除</h4>
+                <p>删除常见停用词如 "the", "is", "and"</p>
+            </div>
+            <div class="cleaning-step">
+                <span class="step-number">5</span>
+                <h4>词形还原</h4>
+                <p>将单词还原为基本形式 (running → run)</p>
+            </div>
+            <div class="cleaning-step">
+                <span class="step-number">6</span>
+                <h4>重新组合</h4>
+                <p>将清洗后的标记重新组合为完整字符串</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="methods">
+        <div class="section-header">
+            <h2>技术方法对比</h2>
+            <p>VADER 词典法 vs 机器学习模型</p>
+        </div>
+        <div class="methods-comparison">
+            <div class="method-card">
+                <div class="method-header">
+                    <div class="method-icon" style="background: var(--gradient-purple);">📖</div>
+                    <div>
+                        <h3>VADER</h3>
+                        <p>Valence Aware Dictionary and sEntiment Reasoner</p>
+                    </div>
+                </div>
+                <ul class="method-features">
+                    <li>专为社交媒体文本设计</li>
+                    <li>考虑标点符号和大小写</li>
+                    <li>支持表情符号和网络语言</li>
+                    <li>无需训练数据</li>
+                </ul>
+                <div class="threshold-box">
+                    <p>复合得分阈值</p>
+                    <p class="value">±0.05</p>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary);">≥0.05: 积极 | ≤-0.05: 消极 | 其他: 中立</p>
+                </div>
+            </div>
+            <div class="method-card best">
+                <div class="method-header">
+                    <div class="method-icon" style="background: var(--gradient-cyan);">🤖</div>
+                    <div>
+                        <h3>Random Forest</h3>
+                        <p>TF-IDF + Random Forest Classifier</p>
+                    </div>
+                </div>
+                <ul class="method-features">
+                    <li>集成学习方法</li>
+                    <li>处理高维TF-IDF特征</li>
+                    <li>强大的泛化能力</li>
+                    <li>8:2 训练/测试划分</li>
+                </ul>
+                <div class="accuracy-box">
+                    <p class="value">83%</p>
+                    <p class="label">准确率 (Accuracy) ← 本项目最佳模型</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="results">
+        <div class="section-header">
+            <h2>实验结果</h2>
+            <p>模型性能评估与对比分析</p>
+        </div>
+        <div class="results-grid">
+            <div class="result-card">
+                <h3>📊 VADER 情感分布</h3>
+                <div class="distribution-bar">
+                    <div class="bar-positive">55.7%</div>
+                    <div class="bar-negative">24.7%</div>
+                    <div class="bar-neutral">19.6%</div>
+                </div>
+                <div class="distribution-legend">
+                    <div class="legend-item">
+                        <div class="count" style="color: var(--accent-green);">18,602</div>
+                        <div class="label">积极</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="count" style="color: var(--accent-red);">8,247</div>
+                        <div class="label">消极</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="count" style="color: var(--accent-gray);">6,547</div>
+                        <div class="label">中立</div>
+                    </div>
+                </div>
+            </div>
+            <div class="result-card">
+                <h3>🎯 机器学习模型准确率</h3>
+                <div class="model-comparison">
+                    <div class="model-item">
+                        <span class="model-name">Naive Bayes</span>
+                        <span class="model-accuracy">80%</span>
+                    </div>
+                    <div class="model-item best">
+                        <span class="model-name">Random Forest ⭐</span>
+                        <span class="model-accuracy">83%</span>
+                    </div>
+                </div>
+                <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary); text-align: center;">
+                    <strong>结论：</strong>Random Forest 以 83% 的准确率表现最佳，是本项目测试的最佳模型
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section id="conclusion">
+        <div class="section-header">
+            <h2>研究结论</h2>
+            <p>基于项目的系统比较分析</p>
+        </div>
+        <div class="conclusion-card">
+            <h3>核心发现</h3>
+            <div class="finding-item">
+                <div class="finding-icon" style="background: var(--gradient-purple);">📖</div>
+                <div class="finding-content">
+                    <h4>基于词典的方法（VADER）</h4>
+                    <p>适用于简单场景，优势在于无需训练数据、解释性强，执行效率高</p>
+                </div>
+            </div>
+            <div class="finding-item">
+                <div class="finding-icon" style="background: var(--gradient-cyan);">🤖</div>
+                <div class="finding-content">
+                    <h4>基于机器学习的方法</h4>
+                    <p>在处理复杂语言时更具表现力，能够捕捉更深层次的语义特征</p>
+                </div>
+            </div>
+            <div class="finding-item">
+                <div class="finding-icon" style="background: var(--gradient-emerald);">🧹</div>
+                <div class="finding-content">
+                    <h4>数据清洗的重要性</h4>
+                    <p>数据清洗是情感分析流程中不可或缺的一步，能够显著提升模型整体性能</p>
+                </div>
+            </div>
+            <div class="finding-item">
+                <div class="finding-icon" style="background: linear-gradient(135deg, #fbbf24, #f59e0b);">🏆</div>
+                <div class="finding-content">
+                    <h4>最佳模型</h4>
+                    <p>Random Forest 模型以 83% 准确率表现最佳，是本项目验证的最优方案</p>
+                </div>
+            </div>
+        </div>
+        <div class="future-directions">
+            <h3>未来研究方向</h3>
+            <div class="direction-item">
+                <span class="direction-number">01</span>
+                <div class="direction-content">
+                    <h4>改进数据质量</h4>
+                    <p>收集和标注更多高质量情感数据，人工标注虽然成本较高但能提供更准确的监督信号</p>
+                </div>
+            </div>
+            <div class="direction-item">
+                <span class="direction-number">02</span>
+                <div class="direction-content">
+                    <h4>融合多种方法</h4>
+                    <p>构建混合模型，结合词典方法和机器学习方法的优点提高整体性能</p>
+                </div>
+            </div>
+            <div class="direction-item">
+                <span class="direction-number">03</span>
+                <div class="direction-content">
+                    <h4>引入深度学习</h4>
+                    <p>采用BERT、RoBERTa等预训练模型更好地理解上下文语义和复杂语言结构</p>
+                </div>
+            </div>
+            <div class="direction-item">
+                <span class="direction-number">04</span>
+                <div class="direction-content">
+                    <h4>实时分析系统</h4>
+                    <p>开发支持实时处理的情感分析工具，应用于社交媒体监控和舆情预警</p>
+                </div>
+            </div>
+        </div>
+        <a href="index.html" class="back-link">← 返回首页</a>
+    </section>
+
+    <footer>
+        <p>© 2024-2025 AI Portfolio | 基于词典法与机器学习的情感分析</p>
+    </footer>
+
+    <script>
+        class NeuralNetwork {
+            constructor() {
+                this.canvas = document.getElementById('neural-canvas');
+                if (!this.canvas) return;
+                this.ctx = this.canvas.getContext('2d');
+                this.particles = [];
+                this.connections = [];
+                this.init();
+                this.animate();
+            }
+            init() {
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                const particleCount = Math.floor((this.canvas.width * this.canvas.height) / 20000);
+                for (let i = 0; i < particleCount; i++) {
+                    this.particles.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        vx: (Math.random() - 0.5) * 0.3,
+                        vy: (Math.random() - 0.5) * 0.3,
+                        radius: Math.random() * 2 + 1,
+                        color: ['rgba(6, 182, 212, ', 'rgba(139, 92, 246, ', 'rgba(16, 185, 129, '][Math.floor(Math.random() * 3)]
+                    });
+                }
+            }
+            resize() {
+                if (!this.canvas) return;
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+            update() {
+                this.particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.x < 0 || p.x > this.canvas.width) p.vx *= -1;
+                    if (p.y < 0 || p.y > this.canvas.height) p.vy *= -1;
+                });
+                this.connections = [];
+                for (let i = 0; i < this.particles.length; i++) {
+                    for (let j = i + 1; j < this.particles.length; j++) {
+                        const dx = this.particles[i].x - this.particles[j].x;
+                        const dy = this.particles[i].y - this.particles[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance < 120) {
+                            this.connections.push({from: this.particles[i], to: this.particles[j], opacity: 1 - distance / 120});
+                        }
+                    }
+                }
+            }
+            draw() {
+                if (!this.ctx) return;
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.connections.forEach(conn => {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(conn.from.x, conn.from.y);
+                    this.ctx.lineTo(conn.to.x, conn.to.y);
+                    this.ctx.strokeStyle = `rgba(6, 182, 212, ${conn.opacity * 0.1})`;
+                    this.ctx.lineWidth = 1;
+                    this.ctx.stroke();
+                });
+                this.particles.forEach(p => {
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    this.ctx.fillStyle = p.color + '0.5)';
+                    this.ctx.fill();
+                });
+            }
+            animate() {
+                this.update();
+                this.draw();
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        function createFloatingParticles() {
+            for (let i = 0; i < 8; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.style.cssText = `position:fixed;width:4px;height:4px;border-radius:50%;pointer-events:none;opacity:0.5;z-index:1;left:${Math.random() * 100}vw;background:${['var(--accent-cyan)','var(--accent-purple)','var(--accent-emerald)'][Math.floor(Math.random()*3)]};animation:floatParticle 12s infinite linear;`;
+                    document.body.appendChild(particle);
+                    setTimeout(() => particle.remove(), 12000);
+                }, i * 1000);
+            }
+        }
+
+        const style = document.createElement('style');
+        style.textContent = `@keyframes floatParticle{0%{transform:translateY(100vh) rotate(0deg);opacity:0}10%{opacity:0.5}90%{opacity:0.5}100%{transform:translateY(-100vh) rotate(720deg);opacity:0}}`;
+        document.head.appendChild(style);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            new NeuralNetwork();
+            createFloatingParticles();
+        });
+    </script>
+
+<style>
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.inland-security-footer {
+  position: fixed;
+  z-index: 10;
+  bottom: 0;
+  right: 0;
+  width: fit-content;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.tooltip-container {
+  position: relative;
+}
+
+.trigger-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  background-color: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.minimax-link {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 300;
+  color: #adadad;
+  text-decoration: none;
+}
+
+.minimax-link:visited {
+  color: #adadad;
+}
+
+.minimax-link:hover {
+  color: #666666;
+}
+
+.tooltip-content {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  padding-bottom: 16px; /* 8px 内容间距 + 8px 用于鼠标移动的透明区域 */
+  font-size: 12px;
+  line-height: 17px;
+  background-color: #fafafa;
+  border-radius: 12px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  color: #171717;
+}
+
+/* 创建透明的连接区域，让鼠标可以平滑移动到 tooltip */
+.tooltip-content::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 16px;
+}
+
+.tooltip-container:hover .tooltip-content {
+  display: flex;
+}
+
+.info-section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.beian-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #171717;
+}
+
+.beian-icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 2px;
+}
+
+.underline-text {
+  color: #171717;
+  text-decoration: underline;
+}
+
+.underline-text:hover {
+  color: #000000;
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .trigger-content {
+    background-color: transparent;
+  }
+
+  .minimax-link,
+  .minimax-link:visited {
+    color: #666666;
+  }
+
+  .minimax-link:hover {
+    color: #adadad;
+  }
+
+  .tooltip-content {
+    background-color: #262626;
+    color: #ededed;
+  }
+
+  .beian-link,
+  .underline-text {
+    color: #ededed;
+  }
+
+  .underline-text:hover {
+    color: #ffffff;
+  }
+}
+
+</style>
+<div class="inland-security-footer">
+  <div class="tooltip-container">
+    <div class="trigger-content">
+      <a href="https://www.minimaxi.com/" target="_blank" rel="noreferrer" class="minimax-link">
+        <span>© 2026 MiniMax</span>
+      </a>
+    </div>
+    <div class="tooltip-content">
+      <section class="info-section">
+        <span>上海稀宇科技有限公司</span>
+      </section>
+
+      <section class="info-section">
+        <a class="beian-link" href="https://www.beian.gov.cn/portal/registerSystemInfo?recordcode=31010402010179" target="_blank" rel="noreferrer">
+          <img alt="hailuo-beian-icon" src="https://cdn.hailuoai.com/hailuo-video-web/public_assets/223037d3-79fd-4db0-a456-749f38a6a14b.png" class="beian-icon">
+          <span class="underline-text">沪公网安备31010402010179号</span>
+        </a>
+        <a href="https://beian.miit.gov.cn/" target="_blank" rel="noreferrer" class="underline-text">
+          沪ICP备2023003282号-38
+        </a>
+      </section>
+
+      <section class="info-section">
+        <span>模型名称：MiniMax</span>
+        <span>备案号：Shanghai-MiniMax-202505230046</span>
+      </section>
+
+      <section class="info-section">
+        <a href="https://agent.minimaxi.com/doc/zh/terms-of-service.html" target="_blank" rel="noreferrer" class="underline-text">
+          用户协议
+        </a>
+        <a href="https://agent.minimaxi.com/doc/zh/privacy-policy.html" target="_blank" rel="noreferrer" class="underline-text">
+          隐私政策
+        </a>
+      </section>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
